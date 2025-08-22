@@ -28,8 +28,12 @@ jobs:
 
       - name: 개인키 인증서 파일 생성
         run: |
-          echo ${{ secrets.SSH_KEY }} > ~/.ssh/id_rsa
-          scp ../frontend/index.html ubuntu@43.203.139.13:~/stemp3/frontend
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 400 ~/.ssh/id_rsa
+          ssh-keyscan -t ed25519 ${{secrets.SERVER_HOST_IP}} >> ~/.ssh/known_hosts
+          ssh-keyscan -t rsa ${{secrets.SERVER_HOST_IP}} >> ~/.ssh/known_hosts
+          scp frontend/index.html ${{secrets.HOST_USERID}}@${{secrets.SERVER_HOST_IP}}:~${{secrets.WORK_PATH}}
 
 
   deploy:
@@ -46,5 +50,5 @@ jobs:
           echo '운영서버에서 github에 파일 복사해 옴'
           git clone https://github.com/jeongsuyeon0725/docker-project
           cp docker-project/frontend/index.html frontend
-          rm -rf docker project
+          rm -rf docker project/frontedn/indexdokz
           docker compose up -d
